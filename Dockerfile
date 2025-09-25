@@ -105,8 +105,6 @@ COPY ros2_test /root/ros2_test
 # (mirrors the “working” Dockerfile pattern)
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
     rosdep install -r --from-paths /root/ros2_test/src --ignore-src -y --rosdistro humble && \
-    cd /root/ros2_test/src/orbslam3_ros2_d455_isaacsim/orb_slam3 && \
-    chmod +x build.sh && ./build.sh Release && \
     cd /root/ros2_test && colcon build --symlink-install"
 
 # ---- Create workspace ----
