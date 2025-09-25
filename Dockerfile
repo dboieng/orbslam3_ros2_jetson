@@ -86,27 +86,47 @@ RUN apt-get update && apt-get install ros-humble-pcl-ros tmux -y
 RUN apt-get install ros-humble-nav2-common x11-apps nano -y
 RUN apt-get install -y gdb gdbserver ros-humble-rmw-cyclonedds-cpp ros-humble-cv-bridge ros-humble-image-transport ros-humble-image-common ros-humble-vision-opencv
 
+RUN apt-get install ros-humble-sensor-msgs ros-humble-geometry-msgs ros-humble-nav-msgs ros-humble-tf2-ros
+   
 # ---- Initialise rosdep ----
 RUN rosdep init && rosdep update
 
+
+# ============================================================
+# Copy your workspace (HOST side)
+# Make sure you run: git submodule update --init --recursive
+# before building so sources are present
+# ============================================================
+# IMPORTANT: Docker context must include the ros2_test workspace
+WORKDIR /root
+COPY ros2_test /root/ros2_test
+
+# ---- Build ORB-SLAM3 + ROS2 wrapper ----
+# (mirrors the “working” Dockerfile pattern)
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
+    rosdep install -r --from-paths /root/ros2_test/src --ignore-src -y --rosdistro humble && \
+    cd /root/ros2_test/src/orbslam3_ros2_d455_isaacsim/orb_slam3 && \
+    chmod +x build.sh && ./build.sh Release && \
+    cd /root/ros2_test && colcon build --symlink-install"
+
 # ---- Create workspace ----
-RUN mkdir -p /root/colcon_ws/src
-WORKDIR /root/colcon_ws/src
+#RUN mkdir -p /root/colcon_ws/src
+#WORKDIR /root/colcon_ws/src
 
 # ---- Clone ORB-SLAM3 core ----
-RUN git clone https://github.com/zang09/ORB-SLAM3-STEREO-FIXED.git ORB_SLAM3
+#RUN git clone https://github.com/zang09/ORB-SLAM3-STEREO-FIXED.git ORB_SLAM3
 
 # ---- Clone ROS2 wrapper (example fork) ----
 #RUN git clone https://github.com/zang09/ORB_SLAM3_ROS2.git orbslam3_ros2
 
 # ---- Build and INSTALL ORB-SLAM3 core ----
-WORKDIR /root/colcon_ws/src/ORB_SLAM3
-RUN chmod +x build.sh && ./build.sh Release && \
-    cmake -S . -B build-release -DCMAKE_BUILD_TYPE=Release && \
-    cmake --build build-release -j$(nproc)
+#WORKDIR /root/colcon_ws/src/ORB_SLAM3
+#RUN chmod +x build.sh && ./build.sh Release && \
+#    cmake -S . -B build-release -DCMAKE_BUILD_TYPE=Release && \
+#    cmake --build build-release -j$(nproc)
     
 # Tell CMake where to find the installed config
-ENV CMAKE_PREFIX_PATH=/root/colcon_ws/install/orb_slam3:$CMAKE_PREFIX_PATH
+#ENV CMAKE_PREFIX_PATH=/root/colcon_ws/install/orb_slam3:$CMAKE_PREFIX_PATH
 
 # ---- Build ROS 2 wrapper ----
 # Build the wrapper and point to the *build* tree
@@ -116,6 +136,7 @@ ENV CMAKE_PREFIX_PATH=/root/colcon_ws/install/orb_slam3:$CMAKE_PREFIX_PATH
 #      --cmake-args -DORB_SLAM3_DIR=/root/colcon_ws/src/ORB_SLAM3/build-release"
 
 # ---- Source environment automatically when container starts ----
-RUN echo 'source /opt/ros/humble/setup.bash'    >> /root/.bashrc && \
-    echo 'source /root/colcon_ws/install/setup.bash' >> /root/.bashrc
+RUN echo 'source /opt/ros/humble/setup.bash'  >> /root/.bashrc && \
+    echo 'source /root/ros2_test/install/setup.bash' >> /root/.bashrc
+
 
