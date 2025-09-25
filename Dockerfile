@@ -87,7 +87,14 @@ RUN apt-get install ros-humble-nav2-common x11-apps nano -y
 RUN apt-get install -y gdb gdbserver ros-humble-rmw-cyclonedds-cpp ros-humble-cv-bridge ros-humble-image-transport ros-humble-image-common ros-humble-vision-opencv
 
 RUN apt-get install ros-humble-sensor-msgs ros-humble-geometry-msgs ros-humble-nav-msgs ros-humble-tf2-ros
-   
+
+# Native Intel RealSense SDK (provides C++ headers and CMake config)
+RUN apt-get update && apt-get install -y \
+    librealsense2-utils \
+    librealsense2-dev \
+    librealsense2-dbg \
+    ros-humble-realsense2-camera
+
 # ---- Initialise rosdep ----
 RUN rosdep init && rosdep update
 
