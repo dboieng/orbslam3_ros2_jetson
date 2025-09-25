@@ -1,3 +1,6 @@
 [submodule "colcon_ws/src/orbslam3_ros2_d435i_jetson"]
 	path = colcon_ws/src/orbslam3_ros2_d435i_jetson
 	url = https://github.com/dboieng/orbslam3_ros2_d435i_jetson.git
+[submodule "ros2_test/src/orbslam3_ros2_d435i_jetson"]
+	path = ros2_test/src/orbslam3_ros2_d435i_jetson
+	url = git@github.com:dboieng/orbslam3_ros2_d435i_jetson.git
