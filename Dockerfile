@@ -90,9 +90,9 @@ RUN apt-get install ros-humble-sensor-msgs ros-humble-geometry-msgs ros-humble-n
 
 # Native Intel RealSense SDK (provides C++ headers and CMake config)
 RUN apt-get update && apt-get install -y \
-    librealsense2-utils \
-    librealsense2-dev \
-    librealsense2-dbg \
+    #librealsense2-utils \
+    #librealsense2-dev \
+    #librealsense2-dbg \
     ros-humble-realsense2-camera
 
 # ---- Initialise rosdep ----
